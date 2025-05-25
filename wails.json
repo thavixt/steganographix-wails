@@ -1,13 +1,13 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "tutorial",
-  "outputfilename": "tutorial",
+  "name": "wails-example-app",
+  "outputfilename": "wails-example-app",
   "frontend:install": "npm install",
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
   "author": {
-    "name": "Péter",
+    "name": "Péter Komlósi",
     "email": "komlosi.peti@gmail.com"
   }
 }
