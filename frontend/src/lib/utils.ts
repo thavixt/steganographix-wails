@@ -9,3 +9,7 @@ export function convertStringToBytes(str: string): Uint8Array {
   const encoder = new TextEncoder();
   return encoder.encode(str);
 }
+
+export async function sleep(ms = 1000) {
+  return new Promise((res) => setTimeout(res, ms))
+}

@@ -34,7 +34,7 @@ export default function About() {
       <Card className="col-span-2">
         <CardTitle>Example</CardTitle>
         <CardContent>
-          The example process below describes how some text is extracted from an image.
+          The example processes below describes how some data (in this case image data - a single pixel) is extracted from an another data source (in this case another image):
         </CardContent>
       </Card>
       <Card className="w-full">

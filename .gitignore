@@ -1,4 +1,7 @@
 build/bin
-frontend/node_modules
+build/windows/installer/tmp/
+
 frontend/dist
+frontend/node_modules
+
 test_images

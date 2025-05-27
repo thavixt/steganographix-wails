@@ -27,8 +27,17 @@ to this in your browser, and you can call your Go code from devtools.
 
 ### Building
 
+[wails build - Documentation](https://wails.io/docs/reference/cli#build)
+
 ```bash
-wails build -tags webkit2_41
+# wails build -tags webkit2_41
+
+# -o          Output file name
+# -clean      Cleans the build/bin directory
+# -platform   Build for the given (comma delimited) platforms eg. windows/arm64. Note, if you do not give the architecture, runtime.GOARCH is used.
+# -nsis       Generate NSIS installer for Windows
+
+wails build -tags webkit2_41 -o Steganographix -clean -platform linux/amd64,windows/amd64 -nsis
 ```
 
 To build a redistributable, production mode package, use `wails build`.

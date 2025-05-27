@@ -1,0 +1,11 @@
+{
+  "name": "steganographix",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Steganographix is an application for performing [steganography](https://en.wikipedia.org/wiki/Steganography) on images, text and audio files.",
+  "scripts": {
+    "build": "wails build -tags webkit2_41 -o Steganographix -clean -platform linux/amd64,windows/amd64 -nsis",
+    "dev": "wails dev -tags webkit2_41",
+    "test": "echo 'TODO'"
+  }
+}

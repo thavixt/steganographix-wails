@@ -2,10 +2,10 @@ import { useRef, useState } from 'react'
 import { FileInput } from '@/components/FileInput';
 import { Canvas } from '@/components/Canvas';
 import { Section } from '@/components/Section';
-import { Button } from '@/components/ui/button.js';
-import { clearCanvas, resizeCanvas } from '../logic/utils.js';
-import { imageFromImage } from '@/logic/imageFromImage.js';
 import PageTitle from '@/components/PageTitle.js';
+import { Button } from '@/components/ui/button.js';
+import { imageFromImage } from '@/logic/imageFromImage.js';
+import { clearCanvas, resizeCanvas } from '@/logic/utils.js';
 
 export default function ImageFromImagePage() {
   const [inputDisabled, setInputDisabled] = useState(true);
@@ -75,7 +75,7 @@ export default function ImageFromImagePage() {
   const extractImage = async () => {
     setInputDisabled(true);
     const result = await imageFromImage(fileName, sourceCanvasRef.current, extractedCanvasRef.current);
-    console.log(result);
+    console.log("imageFromImage result:", result);
     setInputDisabled(false);
   }
 
@@ -93,7 +93,7 @@ export default function ImageFromImagePage() {
         <Section title='Extracted image'>
           <Canvas ref={extractedCanvasRef} />
           {fileDimensions ? (
-            <p>The above image was extracted from a {fileDimensions} image.</p>
+            <p>The above image was extracted from a {fileDimensions} image. Each dimension was halved to obtain the 4 channels for each pixel from 4-pixel groups in the original image.</p>
           ) : null}
           <Button disabled={inputDisabled} onClick={clearCanvases}>Reset</Button>
         </Section>
