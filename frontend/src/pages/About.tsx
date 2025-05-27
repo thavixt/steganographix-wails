@@ -1,10 +1,14 @@
 import { Code } from "@/components/Code";
+import PageTitle from "@/components/PageTitle";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import type { PropsWithChildren } from "react";
 
 export default function About() {
   return (
     <div className="grid grid-cols-2 gap-4">
+      <header className='pb-4 flex flex-col gap-2'>
+        <PageTitle>About Steganographix</PageTitle>
+      </header>
       <Card className="col-span-2">
         <CardTitle>Digital steganography</CardTitle>
         <CardContent className="flex flex-col gap-4">

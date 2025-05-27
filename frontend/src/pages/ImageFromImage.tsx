@@ -5,12 +5,11 @@ import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button.js';
 import { clearCanvas, resizeCanvas } from '../logic/utils.js';
 import { imageFromImage } from '@/logic/imageFromImage.js';
-
-const CANVAS_HEIGHT = 300;
-const CANVAS_WIDTH = 300;
+import PageTitle from '@/components/PageTitle.js';
 
 export default function ImageFromImagePage() {
   const [inputDisabled, setInputDisabled] = useState(true);
+  const [fileName, setFileName] = useState('');
   const [fileDimensions, setFileDimensions] = useState('');
   const sourceInputRef = useRef<HTMLInputElement>(null);
   const sourceCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,6 +45,7 @@ export default function ImageFromImagePage() {
     }
 
     const file = files[0];
+    setFileName(file.name);
     const reader = new FileReader();
     reader.onload = function (event) {
       const img = new window.Image();
@@ -72,77 +72,18 @@ export default function ImageFromImagePage() {
     reader.readAsDataURL(file);
   };
 
-  const onEmbedInput: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const files = e.target.files;
-    if (!files?.length) {
-      setInputDisabled(true);
-      return;
-    };
-
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const img = new window.Image();
-      img.onload = function () {
-        const canvas = toEmbedCanvasRef.current;
-        if (canvas) {
-          canvas.width = CANVAS_WIDTH;
-          canvas.height = CANVAS_HEIGHT;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            // Calculate the scale to fit and fill the canvas (cover)
-            const scale = Math.min(
-              CANVAS_WIDTH / img.width,
-              CANVAS_HEIGHT / img.height
-            );
-            const x = (CANVAS_WIDTH - img.width * scale) / 2;
-            const y = (CANVAS_HEIGHT - img.height * scale) / 2;
-
-            ctx.drawImage(
-              img,
-              0, 0, img.width, img.height, // source
-              x, y, img.width * scale, img.height * scale // destination
-            );
-          }
-        }
-        setInputDisabled(false);
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-  }
-
   const extractImage = async () => {
     setInputDisabled(true);
-    const result = await imageFromImage("TODO.jpg", sourceCanvasRef.current, extractedCanvasRef.current);
+    const result = await imageFromImage(fileName, sourceCanvasRef.current, extractedCanvasRef.current);
     console.log(result);
     setInputDisabled(false);
   }
 
-  const embedImage = async () => {
-    // setInputDisabled(true);
-    // const canvas = sourceCanvasRef.current;
-    // const ctx = canvas?.getContext('2d');
-    // if (!canvas || !ctx) return;
-
-    // const resultCanvas = resultCanvasRef.current;
-    // const resultCtx = resultCanvas?.getContext('2d');
-    // if (!resultCanvas || !resultCtx) return;
-
-    // const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    // Here you would implement your stego algorithm to analyze the image data
-    // For demonstration, we will just copy the original image data to the result canvas
-
-    // const imageUrl = await StegoEmbed();
-    // console.log(imageUrl);
-
-    // resultCtx.putImageData(imageData, 0, 0);
-    // setInputDisabled(false);
-  }
-
   return (
     <div className='w-max-[400px] flex flex-col items-center gap-4'>
+      <header className='pb-4 flex flex-col gap-2'>
+        <PageTitle>Image from image</PageTitle>
+      </header>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
         <Section title='Source image'>
           <Canvas ref={sourceCanvasRef} />
@@ -158,12 +99,12 @@ export default function ImageFromImagePage() {
         </Section>
         <Section title='Image to embed'>
           <Canvas ref={toEmbedCanvasRef} />
-          <FileInput label='Select an image to embed' name='embed' disabled={inputDisabled} onChange={onEmbedInput} />
-          <Button disabled={inputDisabled} onClick={extractImage}>Embed steganographic data</Button>
+          <FileInput label='Select an image to embed' name='embed' disabled={inputDisabled} />
+          <Button disabled={inputDisabled}>Embed steganographic data</Button>
         </Section>
         <Section title='Result image'>
           <Canvas ref={resultCanvasRef} />
-          <Button disabled={inputDisabled} onClick={embedImage}>Download</Button>
+          <Button disabled={inputDisabled}>Download</Button>
         </Section>
       </div>
     </div>

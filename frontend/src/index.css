@@ -50,6 +50,20 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply min-w-[320px] min-h-[100vh] will-change-transform;
+  @apply m-0 p-8 flex place-items-center size-full;
+  @apply bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-slate-50;
+}
+
+header {
+  view-transition-name: header;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -57,14 +71,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  @apply m-0 p-8 flex place-items-center size-full;
-  @apply bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-slate-50;
-  /* @apply border-16 border-gray-300 dark:border-gray-600; */
 }
 
 h1 {
@@ -76,6 +82,16 @@ h1 {
   width: 400px;   /* or any desired display size */
   height: auto;
   image-rendering: pixelated; /* for crisp upscaling */
+}
+
+input[type=file] {
+  @apply border-2 border-transparent rounded-md p-2 disabled:opacity-50 bg-primary text-primary-foreground cursor-pointer disabled:cursor-not-allowed;
+}
+
+button,
+input {
+  /* @apply hover:scale-99; */
+  @apply hover:shadow-md disabled:hover:shadow-none shadow-black/50;
 }
 
 @theme inline {

@@ -1,18 +1,20 @@
-# A go app made with wails
+# Steganographix
+
+Steganographix is an application for performing [steganography](https://en.wikipedia.org/wiki/Steganography) on images, text and audio files.
+
+## Notes about developing with Wails
 
 - https://wails.io/docs/gettingstarted/installation
 
 > If you are using latest Linux version (example: Ubuntu 24.04) and it is not supporting libwebkit2gtk-4.0-dev, then you might encounter an issue in wails doctor: libwebkit not found. To resolve this issue you can install libwebkit2gtk-4.1-dev and during your build use the tag -tags webkit2_41.
 Optionű
 
-## About
+### About
 
-This was made with the official Wails React-TS template.
-
-You can configure the project by editing `wails.json`. More information about the project settings can be found
+This was made with the official Wails React-TS template. More information about the project settings can be found
 here: https://wails.io/docs/reference/project-config
 
-## Live Development
+### Live Development
 
 ```bash
 wails dev -tags webkit2_41
@@ -23,7 +25,7 @@ server that will provide very fast hot reload of your frontend changes. If you w
 and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
 to this in your browser, and you can call your Go code from devtools.
 
-## Building
+### Building
 
 ```bash
 wails build -tags webkit2_41

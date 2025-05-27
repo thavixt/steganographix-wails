@@ -22,9 +22,9 @@ func NewApp() *App {
 
 func (b *App) startup(ctx context.Context) {
 	b.ctx = ctx
-	env := wailsRuntime.Environment(ctx)
-	if env.BuildType == "dev" {
-		wailsRuntime.WindowMaximise(ctx)
+	if wailsRuntime.Environment(ctx).BuildType == "dev" {
+		wailsRuntime.WindowHide(ctx)
+		wailsRuntime.BrowserOpenURL(ctx, "http://127.0.0.1:34115")
 	}
 
 	wailsRuntime.EventsOn(ctx, "route", func(optionalData ...interface{}) {
@@ -33,6 +33,24 @@ func (b *App) startup(ctx context.Context) {
 }
 
 func (b *App) shutdown(ctx context.Context) {}
+
+func (a *App) Notify(message string) {
+	messageDialogOptions := wailsRuntime.MessageDialogOptions{
+		Title:   "Steganographix",
+		Message: message,
+		Type:    wailsRuntime.InfoDialog,
+	}
+	wailsRuntime.MessageDialog(a.ctx, messageDialogOptions)
+}
+
+func (a *App) NotifyError(message string) {
+	messageDialogOptions := wailsRuntime.MessageDialogOptions{
+		Title:   "Steganographix - Error",
+		Message: message,
+		Type:    wailsRuntime.ErrorDialog,
+	}
+	wailsRuntime.MessageDialog(a.ctx, messageDialogOptions)
+}
 
 type RandomImage struct {
 	Message string
