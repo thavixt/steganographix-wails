@@ -41,3 +41,9 @@ wails build -tags webkit2_41 -o Steganographix -clean -platform linux/amd64,wind
 ```
 
 To build a redistributable, production mode package, use `wails build`.
+
+## TODO
+
+- GitHub Action / CI
+- testing (vitest / go test)
+- better styling
