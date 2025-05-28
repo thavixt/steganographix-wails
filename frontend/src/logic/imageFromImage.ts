@@ -1,6 +1,11 @@
-import { convertStringToBytes } from "@/lib/utils";
+import { convertStringToBits } from "@/lib/utils";
 import { scrollToElement } from "./utils";
 import { StegoExtract, Notify } from "../../wailsjs/go/main/App";
+
+function base64ToBytes(base64: string): number[] {
+  const binaryString = atob(base64);
+  return Array.from(binaryString, char => char.charCodeAt(0));
+}
 
 export async function imageFromImage(
   name: string,
@@ -16,56 +21,40 @@ export async function imageFromImage(
   return new Promise<ImageData | string>(async (resolve, reject) => {
     try {
       const sourceCanvasCtx = sourceCanvas?.getContext('2d');
-      if (!sourceCanvas || !sourceCanvasCtx) return;
       const targetCanvasCtx = targetCanvas?.getContext('2d');
-      if (!targetCanvas || !targetCanvasCtx) return;
-      const imageData = sourceCanvasCtx.getImageData(
-        0,
-        0,
-        sourceCanvas.width,
-        sourceCanvas.height,
-      );
+      if (!sourceCanvas || !sourceCanvasCtx || !targetCanvas || !targetCanvasCtx) {
+        console.error('Source and/or target canvases not found');
+        return;
+      };
+
+      const imageData = sourceCanvasCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
       const sourceImageData = new Uint8Array(imageData.data.buffer);
-      console.log("sourceImageData", sourceImageData);
       const extractedString = await StegoExtract(
         Array.from(sourceImageData),
         imageData.width,
         imageData.height,
       );
-      // console.log("extractedString", extractedString);
+      const extractedBytes = base64ToBytes(extractedString as unknown as string);
+      console.log(extractedBytes);
       
-      const extractedBytes = convertStringToBytes(extractedString as unknown as string)
-      console.log("extractedBytes", extractedBytes);
-      const newImageData = targetCanvasCtx.createImageData(
-        imageData.width / 2,
-        imageData.height / 2,
-        { colorSpace: 'srgb' }
-      );
+      // Set your desired width and height for the output image
+      const width = imageData.width / 2;
+      const height = imageData.height / 2;
 
-      // @TODO
-      // @FIXME
-      // something wrong with the looping?
-      // @NOTE look at old implementations?
-      console.log("Running loop after extracting bytes", extractedBytes.length);
-      for (let i = 0; i < extractedBytes.length; i += 4) {
-        console.log(i, "loop: appending", ...extractedBytes.slice(i, i+4));
-        newImageData.data[i % 4 + 0] = extractedBytes[i];     // Red
-        newImageData.data[i % 4 + 1] = extractedBytes[i + 1]; // Green
-        newImageData.data[i % 4 + 2] = extractedBytes[i + 2]; // Blue
-        newImageData.data[i % 4 + 3] = extractedBytes[i + 3]; // Alpha
+      // Create a new ImageData object
+      const newImageData = new ImageData(width, height);
+
+      // Fill the ImageData with the extracted bytes (assumes RGBA)
+      for (let i = 0; i < newImageData.data.length; i++) {
+        newImageData.data[i] = extractedBytes[i] ?? 0; // fallback to 0 if undefined
       }
-      console.log(newImageData.data);
 
-      targetCanvas.width = newImageData.width;
-      targetCanvas.height = newImageData.height;
-      targetCanvasCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+      // Paint to targetCanvas
+      targetCanvas.width = width;
+      targetCanvas.height = height;
       targetCanvasCtx.putImageData(newImageData, 0, 0);
-      
+
       scrollToElement(sourceCanvas);
-      // @todo
-      // should only show notification if enough time has passed or window is not in focus?
-      Notify(`Processing file ${name} finished.`);
-      
       resolve(newImageData);
     } catch (ex) {
       console.error(ex);

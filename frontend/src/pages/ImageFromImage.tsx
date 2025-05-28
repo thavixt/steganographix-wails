@@ -10,14 +10,15 @@ import { clearCanvas, resizeCanvas } from '@/logic/utils.js';
 export default function ImageFromImagePage() {
   const [inputDisabled, setInputDisabled] = useState(true);
   const [fileName, setFileName] = useState('');
-  const [fileDimensions, setFileDimensions] = useState('');
+  const [sourceFileDimensions, setSourceFileDimensions] = useState<Record<'x' | 'y', number> | null>(null);
+  const [resultFileDimensions, setResultFileDimensions] = useState<Record<'x' | 'y', number> | null>(null);
   const sourceInputRef = useRef<HTMLInputElement>(null);
   const sourceCanvasRef = useRef<HTMLCanvasElement>(null);
   const extractedCanvasRef = useRef<HTMLCanvasElement>(null);
   const toEmbedCanvasRef = useRef<HTMLCanvasElement>(null);
   const resultCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const clearCanvases = () => {
+  const resetStates = () => {
     setInputDisabled(true);
     clearCanvas(sourceCanvasRef.current);
     clearCanvas(extractedCanvasRef.current);
@@ -26,7 +27,8 @@ export default function ImageFromImagePage() {
     if (sourceInputRef.current) {
       sourceInputRef.current.value = '';
     }
-    setFileDimensions('');
+    setSourceFileDimensions(null);
+    setResultFileDimensions(null);
   }
 
   const resizeCanvases = (width: number, height: number) => {
@@ -39,8 +41,7 @@ export default function ImageFromImagePage() {
   const onInput: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const files = e.target.files;
     if (!files?.length) {
-      setInputDisabled(true);
-      clearCanvases();
+      resetStates();
       return;
     }
 
@@ -52,15 +53,11 @@ export default function ImageFromImagePage() {
       img.onload = function () {
         const canvas = sourceCanvasRef.current;
         if (canvas) {
-          // Set canvas size to image size
-          canvas.width = img.width;
-          canvas.height = img.height;
-          setFileDimensions(`${img.width} x ${img.height}`)
+          setSourceFileDimensions({ x: img.width, y: img.height });
           resizeCanvases(img.width, img.height);
 
           const ctx = canvas.getContext('2d');
           if (ctx) {
-            // Disable smoothing for pixel-perfect rendering
             ctx.imageSmoothingEnabled = false;
             ctx.drawImage(img, 0, 0, img.width, img.height);
           }
@@ -75,7 +72,10 @@ export default function ImageFromImagePage() {
   const extractImage = async () => {
     setInputDisabled(true);
     const result = await imageFromImage(fileName, sourceCanvasRef.current, extractedCanvasRef.current);
-    console.log("imageFromImage result:", result);
+    if (sourceFileDimensions) {
+      setResultFileDimensions({ x: sourceFileDimensions.x / 2, y: sourceFileDimensions.y / 2 });
+    }
+    console.log("imageFromImage result:", sourceFileDimensions, resultFileDimensions, result);
     setInputDisabled(false);
   }
 
@@ -84,7 +84,7 @@ export default function ImageFromImagePage() {
       <header className='pb-4 flex flex-col gap-2'>
         <PageTitle>Image from image</PageTitle>
       </header>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-12'>
         <Section title='Source image'>
           <Canvas ref={sourceCanvasRef} />
           <FileInput ref={sourceInputRef} label='Select an image' name='input' onChange={onInput} />
@@ -92,10 +92,14 @@ export default function ImageFromImagePage() {
         </Section>
         <Section title='Extracted image'>
           <Canvas ref={extractedCanvasRef} />
-          {fileDimensions ? (
-            <p>The above image was extracted from a {fileDimensions} image. Each dimension was halved to obtain the 4 channels for each pixel from 4-pixel groups in the original image.</p>
+          {(sourceFileDimensions && resultFileDimensions) ? (
+            <>
+              <p>
+                The above image was extracted from a <code>{sourceFileDimensions.x}x{sourceFileDimensions.y}</code> image, resulting in a <code>{resultFileDimensions.x}x{resultFileDimensions.y}</code> image.
+              </p>
+            </>
           ) : null}
-          <Button disabled={inputDisabled} onClick={clearCanvases}>Reset</Button>
+          <Button disabled={inputDisabled} onClick={resetStates}>Reset</Button>
         </Section>
         <Section title='Image to embed'>
           <Canvas ref={toEmbedCanvasRef} />

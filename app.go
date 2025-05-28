@@ -23,14 +23,20 @@ func NewApp() *App {
 func (b *App) startup(ctx context.Context) {
 	b.ctx = ctx
 	if wailsRuntime.Environment(ctx).BuildType == "dev" {
-		wailsRuntime.WindowMaximise(ctx)
+		// wailsRuntime.WindowMaximise(ctx)
 		// wailsRuntime.WindowHide(ctx)
 		// wailsRuntime.BrowserOpenURL(ctx, "http://127.0.0.1:34115")
 	}
-
 	wailsRuntime.EventsOn(ctx, "route", func(optionalData ...interface{}) {
 		wailsRuntime.LogDebugf(ctx, "Route event: %v", optionalData...)
 	})
+}
+
+func (b *App) ondomready(ctx context.Context) {}
+
+func (b *App) beforeclose(ctx context.Context) bool {
+	// true if it should prevent shutdown
+	return false
 }
 
 func (b *App) shutdown(ctx context.Context) {}
@@ -55,11 +61,6 @@ func (a *App) NotifyError(message string) {
 	wailsRuntime.WindowShow(a.ctx)
 }
 
-type RandomImage struct {
-	Message string
-	Status  string
-}
-
 // Steganographic function that extracts the 2 least-singificant bits of each byte in an image
 // Receives an image:Uint8Array<ArrayBufferLike> parameter, width:number and height:number from JS
 func (a *App) StegoExtract(imageData []byte, width int, height int) []byte {
@@ -79,12 +80,19 @@ func (a *App) StegoExtract(imageData []byte, width int, height int) []byte {
 			count = 0
 		}
 	}
+
 	// If there are leftover bits, pad them on the right
 	if count > 0 {
 		currentByte = currentByte << (2 * (4 - count))
 		extractedBytes = append(extractedBytes, currentByte)
 	}
+
 	return extractedBytes
+}
+
+type RandomImage struct {
+	Message string
+	Status  string
 }
 
 func (a *App) StegoEmbed() string {

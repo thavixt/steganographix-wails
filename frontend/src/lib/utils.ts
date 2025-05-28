@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function convertStringToBytes(str: string): Uint8Array {
+export function convertStringToBits(str: string): Uint8Array {
   const encoder = new TextEncoder();
   return encoder.encode(str);
 }
